@@ -33,4 +33,4 @@ if uploaded_file:
 
     st.download_button(label='📥 Download Current Result',
                        data=excel,
-                       file_name='df_test.xlsx')
+                       file_name='chestxcel.xlsx')

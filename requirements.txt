@@ -4,3 +4,5 @@ geopy
 pymongo
 dnspython
 openpyxl
+pyxlsb
+xlsxwriter

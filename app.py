@@ -8,6 +8,9 @@ from pyxlsb import open_workbook as open_xlsb
 # El destruye excels para chestnet
 """
 @st.cache_data
+def convert_df(df):
+   return df.to_csv(index=False).encode('utf-8')
+@st.cache_data
 def to_excel(df):
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -31,6 +34,16 @@ if uploaded_file:
         columns.copy())
     excel = to_excel(df[options])
 
-    st.download_button(label='📥 Download Current Result',
+    st.download_button(label='📥 Download Current Result in EXCEL',
                        data=excel,
-                       file_name='chestxcel.xlsx')
+                       file_name='df_test.xlsx')
+
+    csv = convert_df(df)
+
+    st.download_button(
+        "📥 Download Current Result in CSV",
+        csv,
+        "file.csv",
+        "text/csv",
+        key='download-csv'
+    )

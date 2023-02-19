@@ -6,3 +6,4 @@ dnspython
 openpyxl
 pyxlsb
 xlsxwriter
+streamlit

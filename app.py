@@ -1,39 +1,36 @@
-import pandas as pd
-import streamlit as st
 
-@st.cache_data
-def convert_df(df):
-    return df.to_csv(index=False).encode('utf-8')
+import streamlit as st
+import pandas as pd
+from io import BytesIO
+from pyxlsb import open_workbook as open_xlsb
+
 """
 # El destruye excels para chestnet
 """
-df = ""
-with st.form("Excel mamaleen"):
-    user = st.text_input("username", "chestnet")
-    password = st.text_input("password", type="password")
-    uploaded_file = st.file_uploader("Upload your Excel file")
-    submitted = st.form_submit_button("Submit")
-    if submitted and password == "MeLaPelas123":
-        if uploaded_file is not None:
-            df = pd.read_excel(uploaded_file)
-        columns = [col for col in df.columns]
-    else:
-        st.write("La clave no sirve")
+@st.cache_data
+def to_excel(df):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, index=False, sheet_name='Sheet1')
+    workbook = writer.book
+    worksheet = writer.sheets['Sheet1']
+    format1 = workbook.add_format({'num_format': '0.00'})
+    worksheet.set_column('A:A', None, format1)
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
 
-if df and columns:
-    with st.form("Excel mamaleen"):
-        options = st.multiselect(
-            'Que columnas quieres alv?',
-            columns,
-            columns)
-        submitted = st.form_submit_button("Submit")
-        if submitted:
-            csv = convert_df(df)
+uploaded_file = st.file_uploader("Upload your Excel file")
 
-            st.download_button(
-                "Press to Download",
-                csv,
-                "file.csv",
-                "text/csv",
-                key='download-csv'
-        )
+if uploaded_file:
+    df = pd.read_excel(uploaded_file)
+    columns = [col for col in df.columns]
+    options = st.multiselect(
+        'Que columnas quieres alv?',
+        columns.copy(),
+        columns.copy())
+    excel = to_excel(df[options])
+
+    st.download_button(label='📥 Download Current Result',
+                       data=excel,
+                       file_name='df_test.xlsx')
